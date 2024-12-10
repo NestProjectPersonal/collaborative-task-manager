@@ -7,16 +7,23 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id:string;
 
-    @Column()
-    fullname:string;
+    @Column('text')
+    fullName:string;
 
-    @Column()
+    @Column('text',{
+        unique:true
+    })
     email:string;
 
-    @Column()
+    @Column('text',{
+        select: false
+    })
     password:string;
 
-    @Column()
-    role:string
+    @Column('text',{
+        array: true,
+        default:['user']
+    })
+    role:string[]
 
 }

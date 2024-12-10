@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 
 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -20,6 +19,7 @@ import { UsersModule } from './users/users.module';
       synchronize: true
     }),
     UsersModule,
+    
   ],
   controllers: [],
   providers: [],

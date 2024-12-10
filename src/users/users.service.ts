@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt'
+
+import { LoginUserDto, CreateUserDto, UpdateUserDto } from './dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -21,8 +22,15 @@ export class UsersService {
 
     try {
 
-      const user = this.userRepository.create(createUserDto)
+      const { password, ...userData } = createUserDto; // traer contraseña (desestructurarDTO)
+
+      const user = this.userRepository.create({
+        ...userData,
+        password: bcrypt.hashSync(password, 10)// incriptar en una sola via(data que se va a incriptar(password,#devueltas))
+      });
+
       await this.userRepository.save(user)
+      delete user.password
       return user
 
     } catch (error) {
@@ -47,12 +55,47 @@ export class UsersService {
     return this.userRepository.findOneBy({ id })
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.preload({
+      id: id,
+      ...updateUserDto
+    })
+    if (!user) throw new NotFoundException(`Users with id:${id} not found`)
+
+    try {
+      await this.userRepository.save(user)
+      return user
+
+    } catch (error) {
+      this.handleExceptions(error)
+    }
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.findOne(id);
+    await this.userRepository.remove(user)
+
+  }
+
+
+  async login(loginUserDto: LoginUserDto) {
+
+    const { password, email } = loginUserDto
+
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: { email: true, password: true }
+    })
+    if (!user)
+      throw new UnauthorizedException('Credential are not valid (email)')
+
+    if (!bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Credential are not valid (password)')
+
+    return user
+
+
   }
 
 
