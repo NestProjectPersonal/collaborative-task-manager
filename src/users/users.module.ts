@@ -8,10 +8,10 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RouteController } from './route.controller';
+
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService,JwtStrategy],
   imports:[
     ConfigModule,
     TypeOrmModule.forFeature([
@@ -33,11 +33,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     })
   ],
   exports: [
-    UsersService,
+    //UsersService,
     TypeOrmModule,
     PassportModule,
     JwtModule,
     JwtStrategy
-  ]
+  ],
+  controllers: [UsersController,RouteController],
+  providers: [UsersService,JwtStrategy],
 })
 export class UsersModule {}
