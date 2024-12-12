@@ -6,7 +6,7 @@ export class User {
 
     @PrimaryGeneratedColumn('uuid')
     id:string;
-
+    
     @Column('text')
     fullName:string;
 
