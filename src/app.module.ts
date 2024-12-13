@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { TasksModule } from './tasks/tasks.module';
 
 
 @Module({
@@ -27,6 +28,8 @@ import { join } from 'path';
     }),
 
     UsersModule,
+
+    TasksModule,
     
   ],
   controllers: [],
