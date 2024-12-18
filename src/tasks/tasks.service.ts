@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tasks } from './entities/task.entity';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TasksService {
@@ -12,15 +13,27 @@ export class TasksService {
   constructor(
 
     @InjectRepository(Tasks)
-    private readonly tasksRepository:Repository<Tasks>
+    private readonly tasksRepository:Repository<Tasks>,
+    @InjectRepository(User)
+        private readonly userRepository: Repository<User>
 
   ){}
 
 
   async create(createTaskDto: CreateTaskDto) {
+    const user = await this.userRepository.findOne({
+      where: { id: createTaskDto.userId },
+    });
 
-    const task = this.tasksRepository.create(createTaskDto)
-    return this.tasksRepository.save(task)
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const task = this.tasksRepository.create({
+      ...createTaskDto,
+      user,
+    });
+    return this.tasksRepository.save(task);
    
   }
 

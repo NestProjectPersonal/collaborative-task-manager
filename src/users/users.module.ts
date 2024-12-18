@@ -15,10 +15,9 @@ import { RouteController } from './route.controller';
   imports:[
     ConfigModule,
     TypeOrmModule.forFeature([
-      User,
+      User
     ]),
     PassportModule.register({ defaultStrategy:'jwt'}),
-
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -33,11 +32,12 @@ import { RouteController } from './route.controller';
     })
   ],
   exports: [
-    //UsersService,
+    UsersService,
     TypeOrmModule,
     PassportModule,
     JwtModule,
-    JwtStrategy
+    JwtStrategy,
+    
   ],
   controllers: [UsersController,RouteController],
   providers: [UsersService,JwtStrategy],

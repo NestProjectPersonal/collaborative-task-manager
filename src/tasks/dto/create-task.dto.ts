@@ -1,4 +1,4 @@
-import { IsDate, IsIn, IsNotEmpty, IsString, Length } from "class-validator"
+import { IsDate, IsIn, IsNotEmpty, IsString, IsUUID, Length } from "class-validator"
 import { TaskPriority, TaskStatus } from "src/enums";
 
 
@@ -23,6 +23,10 @@ export class CreateTaskDto {
     @IsIn(Object.values(TaskPriority))
     @IsNotEmpty()
     priority: TaskPriority
+
+    @IsUUID()
+    @IsNotEmpty()
+    userId: string // Genera un UUID por defecto
     
     //@IsDate()
     //createdAt: Date
