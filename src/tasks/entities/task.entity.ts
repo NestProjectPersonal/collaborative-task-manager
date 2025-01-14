@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { TaskPriority, TaskStatus } from "src/enums";
 import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -9,15 +10,18 @@ export class Tasks {
     @PrimaryGeneratedColumn('uuid')
     id:string
     
-
     @Column({nullable: true})
     userId: string;
 
     @Column()
-    title:string
+    @IsNotEmpty()
+    @IsString()
+    title: string;
 
-    @Column()
-    description:string
+    @Column({ nullable: true })
+    @IsOptional()
+    @IsString()
+    description?: string;
 
     @Column({
         default:'pending'
@@ -33,7 +37,7 @@ export class Tasks {
     @UpdateDateColumn()
     updatedAt:Date
     
-    @ManyToOne(() => User, (user) => user.tasks, { onDelete: 'CASCADE' }) // Relación con usuario
+    @ManyToOne(() => User, (user) => user.tasks, {  eager: true , onDelete: 'CASCADE' }) 
     user: User;
 
 }

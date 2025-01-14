@@ -20,22 +20,18 @@ export class TasksService {
   ){}
 
 
-  async create(createTaskDto: CreateTaskDto) {
-    const user = await this.userRepository.findOne({
-      where: { id: createTaskDto.userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+  async create(createTaskDto: CreateTaskDto, user: User) {
+    // Crear la tarea asociada al usuario autenticado
     const task = this.tasksRepository.create({
-      ...createTaskDto,
-      user,
+        ...createTaskDto,
+        user, // Relación directa con el usuario autenticado
     });
-    return this.tasksRepository.save(task);
+
    
-  }
+    return this.tasksRepository.save(task);
+}
+
+
 
   async findAll(paginationDto:PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto

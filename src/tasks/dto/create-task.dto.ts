@@ -6,7 +6,7 @@ import { TaskPriority, TaskStatus } from "src/enums";
 export class CreateTaskDto {
 
     @IsString()
-    @Length(3, 12)
+    @Length(3, 50)
     @IsNotEmpty()
     title: string
     
@@ -24,9 +24,8 @@ export class CreateTaskDto {
     @IsNotEmpty()
     priority: TaskPriority
 
-    @IsUUID()
-    @IsNotEmpty()
-    userId: string // Genera un UUID por defecto
+
+    userId: string 
     
     //@IsDate()
     //createdAt: Date

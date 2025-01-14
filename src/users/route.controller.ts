@@ -18,7 +18,7 @@ export class RouteController {
     return this.usersService.login(loginUserDto);
   }
 
-  @Get('private1')
+  @Post('private1')
   @UseGuards(AuthGuard())
   testRoute(
     @GetUser() user: User
@@ -26,7 +26,7 @@ export class RouteController {
     
     return {
       ok: true,
-      message: 'Mostrar User',
+      message: 'User Login',
       user
     }
   }
