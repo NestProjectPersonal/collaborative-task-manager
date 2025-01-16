@@ -23,9 +23,9 @@ export class User {
 
     @Column('text',{
         array: true,
-        default:['user']
+        default:['user','admin']
     })
-    role:string[]
+    roles:string[]
 
     @OneToMany(() => Tasks, (task) => task.user) 
     tasks: Tasks[];

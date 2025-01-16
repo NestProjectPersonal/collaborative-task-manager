@@ -1,18 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
+import { Auth } from '../users/decorators';
+import { ValidRoles } from '../users/interfaces';
 
 
 @Controller('tasks')
+
 export class TasksController {
   constructor(private readonly tasksService: TasksService) { }
-
+  
   @Post()
+  //@Auth(ValidRoles.admin) => Segun la sea el requerimiento de proteccion de ruta
   @UseGuards(AuthGuard('jwt')) // Protege la ruta con JWT
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
@@ -29,7 +32,7 @@ export class TasksController {
     const user = req.user as User;
     return this.tasksService.findAll(user);
   }
-
+  
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   async findOneTask(@Param('id') id: string, @Request() req: Express.Request) {
