@@ -1,11 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tasks } from './entities/task.entity';
 import { Repository } from 'typeorm';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { User } from 'src/users/entities/user.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { TaskPriority, TaskStatus } from 'src/enums';
+import { FilterDto } from 'src/common/dtos/filter.dto';
 
 @Injectable()
 export class TasksService {
@@ -31,10 +33,16 @@ export class TasksService {
     return this.tasksRepository.save(task);
   }
 
-  async findAll(user: User) {
-    return this.tasksRepository.find({
-      where: { user: { id: user.id } },
+  async findAll(paginationDto: PaginationDto) {
+
+    const { limit = 10, offset = 0 } = paginationDto
+    const tasks = this.tasksRepository.find({
+      take: limit,
+      skip: offset//omitir los primeros(indicativo)
     });
+
+    return tasks
+
   }
 
   async findOne(id: string, user: User) {
@@ -45,6 +53,26 @@ export class TasksService {
     if (!task) throw new NotFoundException('Task not found');
 
     return task;
+  }
+
+  async findFilter(filterDto: FilterDto) {
+
+    const { status, priority } = filterDto;
+
+    const query = this.tasksRepository.createQueryBuilder('task');
+
+    if (status) {
+      query.andWhere('task.status = :status', { status });
+    }
+
+    if (priority) {
+      query.andWhere('task.priority = :priority', { priority });
+    }
+
+    const tasksFilter = await query.getMany();
+
+    return tasksFilter;
+
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, user: User) {

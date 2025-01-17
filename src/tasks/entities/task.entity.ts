@@ -23,9 +23,7 @@ export class Tasks {
     @IsString()
     description?: string;
 
-    @Column({
-        default:'pending'
-    })
+    @Column()
     status:TaskStatus
 
     @Column()
